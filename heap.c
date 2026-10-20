@@ -10,43 +10,49 @@ static void sink(Heap *p, int);
 */
 int less(const Msg *a, const Msg *b)
 {
-        // Энд жиших үйлдийг хийнэ
+        if (b->priority < a->priority) return 1;
+        if (b->priority == a->priority && b->time < a->time) return 1;
+        return 0;
 }
-
-/*
-  Оруулах функц. heap зарчмаар чухлын дарааллыг баримтлан оруулна.
-  Ингэхдээ хамгийн чухал зурвас heap-ын оройд хадгалагдана.
-  x зурвасыг p-ын зааж буй heap бүтцэд оруулна.
- */
 void insert(Heap *p, const Msg x)
 {
-        // Энд оруулах үйлдлийг хийнэ
+        p->h_arr[++p->h_len] = x;
+        swim(p, p->h_len);
 }
-
-/*
-  Heap бүтцийн swim үйлдэл.
-  k нь swim үйлдлийг p-ын зааж буй heap дээр эхлүүлэх индекс.
- */
 static void swim(Heap *p, int k)
 {
-        // Энд swim үйлдлийг хийнэ
+        while (k > 1 && less(&p->h_arr[k / 2], &p->h_arr[k])) {
+                Msg t = p->h_arr[k / 2];
+                p->h_arr[k / 2] = p->h_arr[k];
+                p->h_arr[k] = t;
+                k /= 2;
+        }
 }
-
-/*
-  Heap бүтцийн sink үйлдэл.
-  k нь sink үйлдлийг p-ын зааж буй heap дээр эхлүүлэх индекс.
- */
 static void sink(Heap *p, int k)
 {
-        // Энд sink үйлдлийг хийнэ
+        while (2 * k <= p->h_len) {
+                int j = 2 * k;
+                if (j < p->h_len && less(&p->h_arr[j], &p->h_arr[j + 1]))
+                        j++;
+                if (!less(&p->h_arr[k], &p->h_arr[j]))
+                        break;
+                Msg t = p->h_arr[k];
+                p->h_arr[k] = p->h_arr[j];
+                p->h_arr[j] = t;
+                k = j;
+        }
 }
-
-/*
-  p-ын зааж буй heap бүтцээс оройн элементийг гаргаад буцаах функц.
-  Гаргасны дараа орой бүрийн хувьд heap зарчим хадгалах ёстой.
- */
 Msg delMin(Heap *p)
 {
-        // Энд хамгийн багыг гаргах үйлдлийг хийнэ
+        Msg top;
+        if (p->h_len == 0) {            /* хоосон heap: юу ч гаргахгүй */
+                top.text[0] = '\0';
+                top.priority = 0;
+                top.time = -1;
+                return top;
+        }
+        top = p->h_arr[1];
+        p->h_arr[1] = p->h_arr[p->h_len--];
+        sink(p, 1);
+        return top;
 }
-
