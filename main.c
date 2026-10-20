@@ -21,7 +21,7 @@ int main()
                         x.time = i;
                         insert(&hp, x);
                 } else if (strcmp(cmd, "GET") == 0) {
-                        // GET командаар heap-ээс гаргана
+                        if (hp.h_len == 0) continue;
                         x = delMin(&hp);
                         printf("%s\n", x.text);
                 }
